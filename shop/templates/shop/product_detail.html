@@ -1,0 +1,230 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <title>{{ product.name }} - SiriKnifeShop</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 20px;
+        }
+
+        /* 📌 ปรับ Container ให้กว้างขึ้นและจัดเรียงแบบ 2 คอลัมน์ (ซ้าย-ขวา) */
+        .container {
+            max-width: 1100px;
+            margin: 20px auto;
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .product-detail-layout {
+            display: flex;
+            gap: 40px;
+            align-items: flex-start;
+        }
+
+        .left-column {
+            width: 45%;
+            flex-shrink: 0;
+        }
+
+        .right-column {
+            width: 55%;
+        }
+
+        /* สไตล์แกลเลอรีรูปภาพ */
+        .product-gallery {
+            text-align: center;
+        }
+
+        .main-img {
+            width: 100%;
+            height: 380px;
+            object-fit: contain;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            background: #fff;
+            padding: 10px;
+        }
+
+        .thumbnail-list {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .thumb-img {
+            width: 70px;
+            height: 70px;
+            object-fit: cover;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            cursor: pointer;
+            background: #fff;
+            padding: 2px;
+        }
+
+        .thumb-img:hover,
+        .thumb-img.active {
+            border-color: #007bff;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+        }
+
+        .price {
+            color: #e44d26;
+            font-weight: bold;
+            font-size: 26px;
+            margin: 15px 0;
+        }
+
+        /* สไตล์ส่วนรายละเอียดสินค้า */
+        .description-box {
+            margin: 20px 0;
+            padding: 15px 0;
+            border-top: 1px solid #eee;
+            border-bottom: 1px solid #eee;
+            color: #444;
+            line-height: 1.8;
+            font-size: 15px;
+        }
+
+        .btn-buy {
+            background-color: #28a745;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .btn-buy:hover {
+            background-color: #218838;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            background-color: #007bff;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <a href="{% url 'product_list' %}" class="back-link">← กลับหน้าหลัก</a>
+
+        <div class="product-detail-layout">
+
+            <!-- ฝั่งซ้าย: รูปภาพและแกลเลอรี -->
+            <div class="left-column">
+                <div class="product-gallery">
+                    <img id="main-product-img" src="{{ product.image.url }}" alt="{{ product.name }}" class="main-img">
+
+                    <div class="thumbnail-list">
+                        <img src="{{ product.image.url }}" alt="Thumbnail" class="thumb-img active"
+                            onclick="changeImage(this)">
+
+                        {% for img in product.images.all %}
+                        <img src="{{ img.image.url }}" alt="Thumbnail" class="thumb-img" onclick="changeImage(this)">
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- ฝั่งขวา: ข้อมูลสินค้าและปุ่มสั่งซื้อ -->
+            <div class="right-column">
+                <h1 style="margin-top: 0; font-size: 28px; color: #333;">{{ product.name }}</h1>
+
+                <!-- ราคา (มีคอมม่าคั่นหลักพัน) -->
+                <div class="price">฿{{ product.price|floatformat:2 }}</div>
+
+
+
+                <!-- ส่วนแสดงรายละเอียดสินค้า -->
+                {% if product.description %}
+                <div class="description-box">
+                    <p>{{ product.description|linebreaksbr }}</p>
+                </div>
+                {% endif %}
+
+                <!-- โค้ดสำหรับแสดงข้อความแจ้งเตือน (Messages) -->
+                <!-- โค้ดแสดงข้อความแจ้งเตือนสีฟ้า -->
+<!-- โค้ดแสดงข้อความแจ้งเตือน (แยกสีตามประเภทการแจ้งเตือน) -->
+{% if messages %}
+    <div class="messages" style="margin-bottom: 20px;">
+        {% for message in messages %}
+            {% if 'error' in message.tags or 'warning' in message.tags %}
+                <!-- 🔴 สีแดง สำหรับแจ้งเตือนข้อผิดพลาด / สต็อกไม่พอ -->
+                <div class="alert" style="background-color: #f8d7da; color: #721c24; padding: 12px 18px; border-radius: 6px; border: 1px solid #f5c6cb; font-size: 15px; font-weight: 500;">
+                    {{ message }}
+                </div>
+            {% else %}
+                <!-- 🔵 สีฟ้า สำหรับเพิ่มลงตะกร้าสำเร็จ -->
+                <div class="alert" style="background-color: #d1ecf1; color: #0c5460; padding: 12px 18px; border-radius: 6px; border: 1px solid #bee5eb; font-size: 15px; font-weight: 500;">
+                    {{ message }}
+                </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+{% endif %}
+                <!-- ฟอร์มเลือกสีและเพิ่มลงตะกร้า -->
+                <form action="{% url 'add_to_cart' product.id %}" method="POST">
+    {% csrf_token %}
+
+    {% if product.colors.exists %}
+    <p style="margin-bottom: 10px;"><strong>เลือกสี:</strong></p>
+    <div style="margin-bottom: 20px;">
+        {% for c in product.colors.all %}
+        <label style="margin-right: 20px; cursor: pointer; font-size: 15px;">
+            <input type="radio" name="color" value="{{ c.color_name }}" {% if forloop.first %}required{% endif %}>
+            {{ c.color_name }} (เหลือ {{ c.stock }} ชิ้น)
+        </label>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- 🟢 เพิ่มช่องเลือกจำนวนสินค้า (จำกัดค่าต่ำสุดที่ 1) -->
+    <div style="margin-bottom: 20px;">
+        <label for="quantity" style="display: block; margin-bottom: 8px; font-weight: bold;">จำนวน:</label>
+        <input type="number" id="quantity" name="quantity" value="1" min="1" max="99" 
+               style="width: 90px; padding: 10px; font-size: 16px; border: 1px solid #ccc; border-radius: 6px; outline: none;">
+    </div>
+
+    <button type="submit" class="btn-buy">🛒 เพิ่มลงตะกร้า</button>
+</form>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        function changeImage(element) {
+            document.getElementById('main-product-img').src = element.src;
+
+            let thumbs = document.getElementsByClassName('thumb-img');
+            for (let t of thumbs) {
+                t.classList.remove('active');
+            }
+            element.classList.add('active');
+        }
+    </script>
+
+</body>
+
+</html>

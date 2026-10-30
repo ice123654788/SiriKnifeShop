@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Chat Management - SiriKnifeShop</title>
+    <style>
+        body { 
+            font-family: sans-serif; 
+            background: #f4f4f9; 
+            margin: 0; 
+            padding: 40px; 
+            display: flex; 
+            justify-content: center; 
+        }
+
+        /* 1. สร้างกล่องครอบ (Wrapper) เพื่อกำหนดความกว้างสูงสุดและจัดตำแหน่งปุ่มร่วมกับ container */
+        .chat-wrapper {
+            width: 100%;
+            max-width: 1200px;
+            position: relative;
+        }
+
+        /* 2. สไตล์ปุ่ม ให้อยู่ด้านนอกและชิดขอบซ้ายพอดีกับกล่อง container ด้านล่าง */
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background-color: #007bff;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 15px; /* เว้นระยะห่างระหว่างปุ่มกับกล่อง container */
+            transition: background 0.2s;
+        }
+        .back-btn:hover {
+            background-color: #0056b3;
+        }
+
+        /* 3. กล่อง container หลัก */
+        .admin-container { 
+            background: white; 
+            border-radius: 10px; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08); 
+            display: flex; 
+            height: 75vh; 
+            min-height: 600px; 
+            overflow: hidden; 
+        }
+        
+        /* รายชื่อลูกค้าด้านซ้าย */
+        .sidebar { width: 28%; border-right: 1px solid #ddd; background: #fdfdfd; overflow-y: auto; }
+        .sidebar h3 { padding: 15px; margin: 0; background: #007bff; color: white; font-size: 16px; }
+        .customer-item { display: block; padding: 14px 18px; color: #333; text-decoration: none; border-bottom: 1px solid #eee; transition: 0.2s; }
+        .customer-item:hover, .customer-item.active { background: #e2f0d9; font-weight: bold; }
+
+        /* พื้นที่แชทด้านขวา */
+        .chat-area { width: 72%; display: flex; flex-direction: column; background: #fff; }
+        .chat-header { padding: 15px 20px; background: #f1f1f1; border-bottom: 1px solid #ddd; font-weight: bold; font-size: 16px; }
+        .chat-box { flex-grow: 1; overflow-y: auto; padding: 20px; background: #fafafa; }
+        
+        .message { margin-bottom: 15px; padding: 12px 16px; border-radius: 8px; max-width: 70%; }
+        .user-msg { background: #f1f1f0; margin-right: auto; } 
+        .admin-msg { background: #d1e7dd; margin-left: auto; text-align: right; } 
+        .message img { max-width: 250px; border-radius: 6px; margin-top: 8px; display: block; }
+        
+        .chat-form { display: flex; padding: 12px 20px; background: #f1f1f1; border-top: 1px solid #ddd; gap: 10px; align-items: center; }
+        .chat-form input[type="text"] { flex-grow: 1; padding: 10px 14px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; }
+        .btn { background: #28a745; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="chat-wrapper">
+    <!-- ปุ่มอยู่ด้านนอก container และจัดตำแหน่งชิดขอบซ้ายพอดี -->
+    <a href="{% url 'product_list' %}" class="back-btn">← กลับหน้าหลักร้านค้า</a>
+
+    <div class="admin-container">
+        <!-- Sidebar รายชื่อลูกค้า -->
+        <div class="sidebar">
+            <h3>รายชื่อลูกค้าที่ติดต่อมา</h3>
+            {% for cust in customers %}
+                <a href="{% url 'chat_room_detail' cust.id %}" class="customer-item {% if selected_customer and selected_customer.id == cust.id %}active{% endif %}">
+                    👤 {{ cust.username }}
+                </a>
+            {% empty %}
+                <p style="padding: 15px; color: #888; text-align: center;">ยังไม่มีลูกค้า</p>
+            {% endfor %}
+        </div>
+
+        <!-- ส่วนห้องแชท -->
+        <div class="chat-area">
+            {% if selected_customer %}
+                <div class="chat-header">กำลังสนทนากับ: {{ selected_customer.username }}</div>
+                
+                <div class="chat-box">
+                    {% for msg in messages %}
+                        <div class="message {% if msg.is_admin_reply %}admin-msg{% else %}user-msg{% endif %}">
+                            <small style="color: #666;"><strong>{% if msg.is_admin_reply %}คุณ (Admin){% else %}{{ msg.user.username }}{% endif %}</strong> ({{ msg.created_at|date:"d/m/Y H:i" }})</small>
+                            {% if msg.message %}
+                                <p style="margin: 5px 0 0 0;">{{ msg.message }}</p>
+                            {% endif %}
+                            {% if msg.image %}
+                                <a href="{{ msg.image.url }}" target="_blank">
+                                    <img src="{{ msg.image.url }}" alt="Uploaded Slip">
+                                </a>
+                            {% endif %}
+                        </div>
+                    {% empty %}
+                        <p style="text-align: center; color: #888; margin-top: 50px;">ยังไม่มีประวัติการสนทนากับลูกค้ารายนี้</p>
+                    {% endfor %}
+                </div>
+
+                <!-- ฟอร์มตอบกลับของแอดมิน -->
+                <form method="POST" enctype="multipart/form-data" class="chat-form">
+                    {% csrf_token %}
+                    <input type="hidden" name="target_user_id" value="{{ selected_customer.id }}">
+                    <input type="text" name="message" placeholder="พิมพ์ข้อความตอบกลับ..." required>
+                    <input type="file" name="image" accept="image/*">
+                    <button type="submit" class="btn">ตอบกลับ</button>
+                </form>
+            {% else %}
+                <div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #888;">
+                    กรุณาเลือกชื่อลูกค้าจากแถบด้านซ้ายเพื่อเริ่มสนทนา
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

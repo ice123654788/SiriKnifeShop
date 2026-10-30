@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <title>สมัครสมาชิก</title>
+    <style>
+    /* สไตล์สำหรับกล่องข้อความแจ้งเตือนข้อผิดพลาดให้เป็นสีแดง */
+    .errorlist {
+        color: #dc3545; /* สีแดง */
+        list-style-type: none;
+        padding: 0;
+        margin: 5px 0 0 0;
+        font-size: 13px;
+    }
+    .errorlist li {
+        margin-bottom: 3px;
+    }
+    /* (โค้ด CSS เดิมของคุณที่มีอยู่แล้วปล่อยไว้ได้เลยครับ) */
+</style>
+    <style>
+        
+        body { font-family: sans-serif; background-color: #f4f4f9; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .box { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); width: 350px; }
+        h2 { text-align: center; color: #333; margin-top: 0; }
+        form p { margin-bottom: 15px; font-size: 14px; }
+        input { width: 100%; padding: 8px; margin-top: 5px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
+        .btn { width: 100%; padding: 10px; background-color: #28a745; color: white; border: none; border-radius: 4px; font-size: 16px; cursor: pointer; margin-top: 10px; }
+        .btn:hover { background-color: #218838; }
+        .link { text-align: center; margin-top: 15px; font-size: 14px; }
+        .link a { color: #007bff; text-decoration: none; }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <h2>สมัครสมาชิก</h2>
+        <form method="POST">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn">สมัครสมาชิก</button>
+        </form>
+        <div class="link">
+            มีบัญชีอยู่แล้ว? <a href="{% url 'login_view' %}">เข้าสู่ระบบ</a>
+        </div>
+    </div>
+</body>
+</html>

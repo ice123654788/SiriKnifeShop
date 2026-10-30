@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <title>สั่งซื้อสำเร็จ</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            background-color: #f4f4f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div
+        style="background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); width: 400px; text-align: center;">
+        <h2 style="color: #28a745; margin-top: 0;">สั่งซื้อสำเร็จเรียบร้อย!</h2>
+        <p style="font-size: 14px; color: #555; line-height: 1.6;">คำสั่งซื้อหมายเลข <strong>#{{ order.id }}</strong>
+            ของคุณถูกบันทึกแล้ว<br>ร้านค้ากำลังตรวจสอบสลิปการโอนเงินของคุณครับ</p>
+        <a href="{% url 'download_receipt_pdf' order.id %}"
+            style="display: inline-block; margin-top: 15px; padding: 10px 20px; background-color: #007bff; color: white; border-radius: 4px; text-decoration: none; font-size: 14px;">ดาวน์โหลดใบเสร็จ</a>
+        <a href="{% url 'product_list' %}"
+            style="display: inline-block; margin-top: 15px; padding: 10px 20px; background-color: #333; color: white; border-radius: 4px; text-decoration: none; font-size: 14px;">กลับสู่หน้าแรก</a>
+    </div>
+</body>
+
+</html>

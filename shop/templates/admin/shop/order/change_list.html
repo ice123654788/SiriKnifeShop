@@ -1,0 +1,28 @@
+{% extends "admin/change_list.html" %}
+
+{% block extrahead %}
+    {{ block.super }}
+    <style>
+        .revenue-container {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            padding: 15px 20px;
+            margin-bottom: 20px;
+            border-radius: 6px;
+        }
+        .revenue-box {
+            font-size: 16px;
+            color: #15803d;
+            font-weight: bold;
+        }
+        .revenue-box.empty {
+            color: #dc2626;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+  
+    
+    {{ block.super }}
+{% endblock %}

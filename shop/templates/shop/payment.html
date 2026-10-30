@@ -1,0 +1,74 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <title>2. ชำระเงินผ่าน QR Code</title>
+    <style>
+    body { 
+        font-family: sans-serif; 
+        background-color: #f4f4f9; 
+        display: flex; 
+        justify-content: center; 
+        align-items: center; 
+        min-height: 100vh; 
+        margin: 0; 
+    }
+    .box { 
+        background: white; 
+        padding: 30px; 
+        border-radius: 8px; 
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1); 
+        width: 600px; 
+        /* เปลี่ยนจาก height: 800px เป็น min-height หรือเอาออกเพื่อให้กล่องยืดหยุ่นตามเนื้อหา */
+        min-height: auto; 
+        text-align: center; 
+    }
+    .price { font-size: 20px; color: #e44d26; font-weight: bold; margin: 10px 0; }
+    .qr-img { width: 300px; height: auto; object-fit: contain; border: 1px solid #ddd; border-radius: 6px; padding: 5px; background: #fff; margin: 15px 0; }
+    .upload-box { margin: 20px 0; text-align: left; }
+    input[type="file"] { width: 100%; font-size: 13px; margin-top: 5px; }
+    .btn { width: 100%; padding: 10px; background-color: #007bff; color: white; border: none; border-radius: 4px; font-size: 16px; cursor: pointer; }
+    .btn:hover { background-color: #0056b3; }
+</style>
+</head>
+<body>
+    <div class="box">
+        <h2>สแกนเพื่อชำระเงิน</h2>
+        <p style="font-size: 14px; color: #666;">พร้อมเพย์ (PromptPay)</p>
+        <!-- แทนที่บรรทัดเดิมด้วยรายละเอียดราคารวมภาษีมูลค่าเพิ่ม -->
+        <div style="background: #f8f9fa; border: 1px solid #e9ecef; padding: 12px; border-radius: 6px; margin: 15px 0; text-align: left; font-size: 14px; color: #333;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                <span>ราคาสินค้า (Subtotal):</span>
+                <span>฿{{ subtotal|floatformat:2 }} บาท</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                <span>ภาษีมูลค่าเพิ่ม (VAT 7%):</span>
+                <span>฿{{ vat|floatformat:2 }} บาท</span>
+            </div>
+            <hr style="border: none; border-top: 1px solid #ddd; margin: 8px 0;">
+            <div style="display: flex; justify-content: space-between; font-size: 18px; color: #e44d26; font-weight: bold;">
+                <span>ยอดชำระสุทธิ (Grand Total):</span>
+                <span>฿{{ grand_total|floatformat:2 }} บาท</span>
+            </div>
+        </div>
+        
+        <!-- 📌 จุดสำหรับแสดงรูป QR Code ของคุณ -->
+        <!-- ตัวอย่าง: ใส่ลิงก์รูปภาพ QR ของคุณตรง src ด้านล่างนี้ได้เลย -->
+        <img src="{% static 'shop/images/qr.jpg' %}" alt="QR Code พร้อมเพย์" class="qr-img">
+        <div style="background: #e7f3ff; border-left: 4px solid #007bff; padding: 12px 15px; margin-bottom: 15px; border-radius: 4px; font-size: 14px; color: #004085;">
+    📦 <strong>ข้อมูลการจัดส่ง:</strong> สินค้าจัดส่งผ่าน <strong>Flash Express</strong> 
+    โดยทางร้านจะส่งรหัสติดตามพัสดุให้คุณทาง <strong>ช่องทางแชทส่วนตัว</strong> บนเว็บไซต์หลังจากจัดส่งเสร็จสิ้นครับ
+</div>
+        
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="upload-box">
+                <label style="font-size: 14px; color: #333; font-weight: bold;">แนบหลักฐานการโอนเงิน (สลิป):</label>
+                <input type="file" name="slip_image" accept="image/*" required>
+            </div>
+            <button type="submit" class="btn">ยืนยันการชำระเงิน</button>
+        </form>
+    </div>
+</body>
+</html>

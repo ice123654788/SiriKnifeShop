@@ -1,0 +1,354 @@
+{% load static %}
+{% load humanize %}
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <title>SiriKnifeShop</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+        }
+
+        .navbar {
+            background: #ffffff;
+            padding: 15px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .right-column {
+            width: 320px;
+            /* ปรับจาก 280px เป็น 320px */
+            flex-shrink: 0;
+        }
+
+        /* ขยายความสูงของแบนเนอร์ขวาให้ยาวขึ้นเทียบเท่าฝั่งซ้าย */
+        .right-column .vertical-banner {
+            min-height: 520px;
+        }
+
+        .navbar h2 {
+            margin: 0;
+            font-size: 22px;
+            color: #1e293b;
+            font-weight: 700;
+        }
+
+        .navbar .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .navbar .user-welcome {
+            font-size: 14px;
+            color: #64748b;
+            margin-right: 8px;
+        }
+
+        .navbar a {
+            text-decoration: none;
+            color: #475569;
+            font-size: 14px;
+            font-weight: 500;
+            padding: 8px 14px;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .navbar a:hover {
+            background-color: #f1f5f9;
+            color: #0f172a;
+        }
+
+        .navbar a.cart-btn {
+            background-color: #eff6ff;
+            color: #2563eb;
+            font-weight: 600;
+        }
+
+        .navbar a.cart-btn:hover {
+            background-color: #dbeafe;
+        }
+
+        .navbar a.logout-btn {
+            color: #dc2626;
+        }
+
+        .navbar a.logout-btn:hover {
+            background-color: #fef2f2;
+        }
+
+        .hero-banner {
+            position: relative;
+            width: 100%;
+            height: 350px;
+            background-image: url('{% static "shop/images/banner.jpg" %}');
+            background-size: cover;
+            background-position: center;
+            margin-bottom: 30px;
+        }
+
+        .main-container {
+            max-width: 1400px;
+            /* ขยายความกว้างรวมของหน้าเว็บขึ้นอีกนิดเพื่อให้รับ 4 คอลัมน์ได้สบายๆ */
+            margin: 0 auto;
+            padding: 0 20px 40px 20px;
+            display: flex;
+            gap: 30px;
+        }
+
+        .sidebar {
+            width: 280px;
+            flex-shrink: 0;
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            height: fit-content;
+            position: sticky;
+            top: 10px;
+        }
+
+        .sidebar h3 {
+            font-size: 18px;
+            margin-top: 0;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 12px;
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar li {
+            margin-bottom: 12px;
+        }
+
+        .sidebar a {
+            display: block;
+            padding: 10px 15px;
+            text-decoration: none;
+            color: #333;
+            font-size: 16px;
+            border-radius: 6px;
+            transition: 0.2s;
+        }
+
+        .sidebar a:hover,
+        .sidebar a.active {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .content-area {
+            flex-grow: 1;
+        }
+
+        h2.section-title {
+            margin-top: 0;
+            color: #333;
+            margin-bottom: 25px;
+            font-size: 24px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- แถบ Navbar -->
+    <div class="navbar">
+        <h2>🛒 SiriKnifeShop</h2>
+        <div class="nav-links">
+            {% if user.is_authenticated %}
+            <span class="user-welcome">ยินดีต้อนรับ, <b>{{ user.username }}</b></span>
+            {% if request.user.is_authenticated and request.user.is_staff %}
+            <a href="{% url 'admin:index' %}" style="color: #007bff; font-weight: bold;">⚙️ หลังบ้าน</a>
+            {% endif %}
+            <a href="{% url 'contact_view' %}">📞 ติดต่อเรา</a>
+            <a href="{% url 'chat_room' %}">💬 ติดต่อแอดมิน</a>
+            <a href="{% url 'cart_detail' %}" class="cart-btn">🛍️ ตะกร้าสินค้า</a>
+            <a href="{% url 'logout' %}" class="logout-btn">🚪 ออกจากระบบ</a>
+            {% else %}
+            <a href="{% url 'contact_view' %}">📞 ติดต่อเรา</a>
+            <a href="{% url 'login_view' %}" style="background: #007bff; color: white;">เข้าสู่ระบบ</a>
+            <a href="{% url 'register_view' %}">สมัครสมาชิก</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- แบนเนอร์ -->
+    <div class="hero-banner"></div>
+
+    <!-- ส่วนเนื้อหาหลัก (Sidebar + รายการสินค้า) -->
+    <div class="main-container">
+
+        <div class="sidebar">
+            <form method="GET" action="{% url 'product_list' %}">
+
+                <!-- 1. ช่องค้นหา -->
+                <div style="display: flex; gap: 5px; margin-bottom: 15px;">
+                    <input type="text" name="q" value="{{ search_query|default:'' }}" placeholder="🔍 ค้นหาสินค้า..."
+                        style="flex-grow: 1; padding: 8px 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; outline: none;">
+                    <button type="submit"
+                        style="background: #007bff; color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-weight: bold;">ค้นหา</button>
+                </div>
+
+                <!-- 2. กล่องกรองตามราคา -->
+                <div class="card p-3 mb-4 shadow-sm border-0">
+                    <h3>กรองตามราคา</h3>
+
+                    <!-- จัดเรียง ต่ำสุด, ขีดคั่น, สูงสุด และปุ่มตกลง ให้อยู่ในบรรทัดเดียวกัน -->
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                        <input type="number" name="min_price" value="{{ request.GET.min_price }}"
+                            class="form-control form-control-sm" placeholder="ต่ำสุด"
+                            style="width: 35%; border-radius: 6px; padding: 6px 4px; text-align: center;">
+
+                        <span style="color: #6c757d; font-weight: bold;">-</span>
+
+                        <input type="number" name="max_price" value="{{ request.GET.max_price }}"
+                            class="form-control form-control-sm" placeholder="สูงสุด"
+                            style="width: 35%; border-radius: 6px; padding: 6px 4px; text-align: center;">
+
+                        <button type="submit"
+                            style="background: #007bff; color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-weight: bold;">กรอง</button>
+                    </div>
+
+                </div>
+
+            </form>
+
+            <h3 style="margin-top: 25px;">ประเภทสินค้า</h3>
+            <ul>
+                <li>
+                    <a href="{% url 'product_list' %}" class="{% if not selected_category %}active{% endif %}">
+                        สินค้าทั้งหมด
+                    </a>
+                </li>
+                {% for cat in categories %}
+                <li>
+                    <a href="{% url 'product_list' %}?category={{ cat.slug }}"
+                        class="{% if selected_category == cat.slug %}active{% endif %}">
+                        {{ cat.name }}
+                    </a>
+                </li>
+                {% endfor %}
+            </ul>
+            <div class="vertical-banner">
+
+                <div>
+                    <img src="{% static 'shop/images/banner-left.jpg' %}" alt="แบนเนอร์ซ้าย"
+                        style="width: 100%; height: 100%; object-fit: cover; border-radius: 6px; display: block;">
+                </div>
+            </div>
+        </div>
+
+        <!-- รายการสินค้าด้านขวา -->
+        <div class="content-area">
+
+            <!-- ส่วนแสดงสินค้าขายดี (Best Sellers) -->
+            {% if best_sellers %}
+            <div
+                style="margin-bottom: 30px; background: #fffbeb; border: 1px solid #fde68a; padding: 20px; border-radius: 8px;">
+                <h3 style="font-size: 20px; font-weight: bold; margin-top: 0; margin-bottom: 15px; color: #b45309;">🔥
+                    สินค้าขายดีประจำร้าน</h3>
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
+                    {% for product in best_sellers %}
+                    <a href="{% url 'product_detail' product.id %}"
+                        style="background: #fff; border: 1px solid #e5e7eb; border-radius: 6px; padding: 12px; text-decoration: none; color: inherit; box-shadow: 0 1px 3px rgba(0,0,0,0.05); display: block; position: relative;">
+                        <span
+                            style="position: absolute; top: 8px; right: 8px; background: #ef4444; color: #fff; font-size: 10px; padding: 2px 6px; border-radius: 10px; font-weight: bold;">
+                            ขายแล้ว {{ product.total_sold|default:0 }} ชิ้น
+                        </span>
+                        {% if product.image %}
+                        <img src="{{ product.image.url }}" alt="{{ product.name }}"
+                            style="width: 100%; height: 130px; object-fit: contain; margin-bottom: 8px;">
+                        {% endif %}
+                        <h4
+                            style="font-size: 14px; font-weight: 600; color: #374151; margin: 5px 0; height: 36px; overflow: hidden;">
+                            {{ product.name }}</h4>
+                        <p style="color: #d9534f; font-weight: bold; font-size: 15px; margin: 5px 0;">
+                            ฿{{product.price|floatformat:0|intcomma }}.00</p>
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <h2 class="section-title">
+                {% if selected_category %}
+                {% for cat in categories %}
+                {% if selected_category == cat.slug %}{{ cat.name }}{% endif %}
+                {% endfor %}
+                {% else %}
+                รายการสินค้าทั้งหมด
+                {% endif %}
+            </h2>
+
+            <!-- แสดงการ์ดสินค้า -->
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
+                {% for product in products %}
+                <a href="{% url 'product_detail' product.id %}"
+                    style="display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box; background: #ffffff; border: 1px solid #e0e0e0; border-radius: 8px; padding: 15px; text-decoration: none; color: inherit; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+
+                    <div style="text-align: center;">
+                        {% if product.image %}
+                        <img src="{{ product.image.url }}" alt="{{ product.name }}"
+                            style="width: 100%; height: 200px; object-fit: contain;">
+                        {% endif %}
+
+                        <h3 style="color: #333; font-size: 16px; margin: 10px 0;">{{ product.name }}</h3>
+                    </div>
+
+                    <div style="text-align: center; margin-top: auto;">
+                        <p style="color: #d9534f; font-weight: bold; font-size: 18px; margin: 5px 0;">
+                            ฿{{ product.price|floatformat:0|intcomma }}.00
+                        </p>
+
+                        <p style="color: #666; font-size: 14px; margin: 0 0 12px 0;">
+                            {% if product.total_stock > 0 %}
+                            คงเหลือ: {{ product.total_stock }} ชิ้น
+                            {% else %}
+                            <span style="color: #d9534f; font-weight: bold;">สินค้าหมด</span>
+                            {% endif %}
+                        </p>
+
+                        <span
+                            style="display: inline-block; background: #007bff; color: white; padding: 6px 16px; border-radius: 4px; font-size: 13px; font-weight: bold;">
+                            ดูรายละเอียด
+                        </span>
+                    </div>
+
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="right-column">
+            <div class="vertical-banner" style="padding: 10px;">
+                <img src="{% static 'shop/images/banner-right.jpg' %}" alt="แบนเนอร์ขวา"
+                    style="width: 100%; height: 100%; object-fit: cover; border-radius: 6px; display: block;">
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <footer
+        style="background: #ffffff; text-align: center; padding: 20px; margin-top: 50px; border-top: 1px solid #e0e0e0; color: #666; font-size: 14px;">
+        <p>© 2026 SiriKnifeShop. All rights reserved. | จัดส่งรวดเร็ว ปลอดภัย ได้ของแท้ 100%</p>
+    </footer>
+
+</body>
+
+</html>

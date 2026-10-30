@@ -1,0 +1,157 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <title>ติดต่อเรา - SiriKnifeShop</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            background: #f4f4f9;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* 1. จัดเลย์เอาต์หลักเป็น 3 คอลัมน์ และให้ความสูงยืดเท่ากันทั้งหมด */
+        .main-container {
+            max-width: 1700px;
+            margin: 40px auto;
+            padding: 0 20px;
+            display: flex;
+            gap: 25px;
+            justify-content: center;
+            align-items: stretch; /* ทำให้ทุกคอลัมน์สูงเท่ากับคอลัมน์ที่ยาวที่สุดอัตโนมัติ */
+        }
+
+        /* คอลัมน์ซ้ายและขวา (แบนเนอร์) */
+        .left-column,
+        .right-column {
+            width: 320px;
+            flex-shrink: 0;
+            display: flex;
+        }
+
+        .vertical-banner {
+            background: white;
+            padding: 10px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ให้รูปภาพในแบนเนอร์ยืดขยายเต็มความสูงของกล่องพอดี */
+        .vertical-banner img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 6px;
+            display: block;
+            flex-grow: 1;
+        }
+
+        /* คอลัมน์กลาง (ปุ่มอยู่นอกกล่องเนื้อหาเหมือนเดิม) */
+        .contact-wrapper {
+            flex-grow: 1;
+            max-width: 800px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .contact-container {
+            background: white;
+            padding: 35px 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 480px; /* ปรับตัวเลขนี้เพิ่มขึ้น/ลดลงได้ตามความสูงของแบนเนอร์ครับ */
+        }
+
+        h1 {
+            color: #333;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+
+        p,
+        li {
+            line-height: 1.6;
+            color: #555;
+        }
+
+        /* สไตล์ปุ่มกลับหน้าหลัก (อยู่นอกกล่องด้านบนซ้าย) */
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background-color: #007bff;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 15px;
+            width: fit-content;
+            transition: background 0.2s;
+        }
+
+        .btn-back:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="main-container">
+        <!-- 1. คอลัมน์ซ้าย: แบนเนอร์แนวตั้งซ้าย -->
+        <div class="left-column">
+            <div class="vertical-banner">
+                <img src="{% static 'shop/images/banner-left.jpg' %}" alt="แบนเนอร์ซ้าย">
+            </div>
+        </div>
+
+        <!-- 2. คอลัมน์กลาง: ปุ่มอยู่นอกการ์ด + กล่องเนื้อหา -->
+        <div class="contact-wrapper">
+            <a href="{% url 'product_list' %}" class="btn-back">← กลับหน้าหลักร้านค้า</a>
+
+            <div class="contact-container">
+                <div>
+                    <h1>📞 ติดต่อเรา & ข้อมูลร้านค้า</h1>
+                    <p>ยินดีต้อนรับสู่ <strong>SiriKnifeShop</strong> แหล่งรวมมีดบาลิซองและอุปกรณ์เทรนเนอร์คุณภาพสูง</p>
+
+                    <h3>📦 ข้อมูลการจัดส่ง</h3>
+                    <ul>
+                        <li>จัดส่งสินค้าผ่าน <strong>Flash Express</strong> ทุกวัน</li>
+                        <li>หลังจากตรวจสอบการชำระเงินเรียบร้อย ทางร้านจะจัดส่งและแจ้ง <strong>รหัสติดตามพัสดุ (Tracking Number)</strong> ให้ทางห้องแชทส่วนตัวบนเว็บไซต์ครับ</li>
+                    </ul>
+
+                    <h3>💬 ช่องทางการติดต่อเพิ่มเติม</h3>
+                    <ul>
+                        <li>Email: sirigorawitnakrab@gmail.com</li>
+                        <li>เบอร์โทรติดต่อ: 063-626-0284</li>
+                        <li>ติดต่อสอบถามผ่านระบบแชทบนเว็บไซต์: <a href="{% url 'chat_room' %}">คลิกที่นี่เพื่อคุยกับแอดมิน</a></li>
+                        <li>เวลาทำการ: 09.00 น. - 21.00 น.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. คอลัมน์ขวา: แบนเนอร์แนวตั้งขวา -->
+        <div class="right-column">
+            <div class="vertical-banner">
+                <img src="{% static 'shop/images/banner-right.jpg' %}" alt="แบนเนอร์ขวา">
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>
